@@ -88,6 +88,7 @@ int m_nTotalLines;
 #define DEFAULT_IP "127.0.0.1"
 #define DEFAULT_LOBBYPORT "30002"
 #define DEFAULT_PORT "27015"
+#define DEFAULT_LOGFILE "csods"
 
 HINTERFACEMODULE LoadFilesystemModule(void)
 {
@@ -499,7 +500,12 @@ int main(int argc, char* argv)
             g_iPort = atoi(port);
 
         const char* logfile;
-        if (CommandLine()->CheckParm("-logfile", &logfile) && logfile)
+        if (CommandLine()->CheckParm("-logfile", &logfile) == NULL)
+        {
+            CommandLine()->AppendParm("-logfile", DEFAULT_LOGFILE);
+            memcpy(g_pLogFile, DEFAULT_LOGFILE, sizeof(g_pLogFile));
+        }
+        else if (logfile)
             memcpy(g_pLogFile, logfile, sizeof(g_pLogFile));
 
         time_t currentTime = time(NULL);
