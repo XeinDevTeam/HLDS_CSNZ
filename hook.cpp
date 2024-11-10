@@ -48,6 +48,9 @@ DWORD g_dwMpSize;
 #define VOXELADAPTER_PTR_SIG_CSNZ "\xE8\x00\x00\x00\x00\x83\xFE\x00\x7C"
 #define VOXELADAPTER_PTR_MASK_CSNZ "x????xx?x"
 
+#define VOXELWORLD_PTR_SIG_CSNZ "\x83\x3D\x00\x00\x00\x00\x00\x0F\x84\x00\x00\x00\x00\x83\x3D\x00\x00\x00\x00\x00\x56"
+#define VOXELWORLD_PTR_MASK_CSNZ "xx?????xx????xx?????x"
+
 char g_pVxlPath[MAX_PATH];
 bool g_bUseSSL = false;
 std::string voxelVxlURL;
@@ -68,6 +71,12 @@ tEVP_CIPHER_CTX_new g_pfnEVP_CIPHER_CTX_new;
 
 typedef void* (*tCVoxelAdapter)();
 tCVoxelAdapter g_pVoxelAdapter;
+
+class CVoxelWorld
+{
+};
+
+CVoxelWorld* g_pVoxelWorld = NULL;
 
 #pragma region Nexon NGClient/NXGSM
 char NGClient_Return1()
@@ -171,7 +180,15 @@ static const int TIMEOUT = 3000;
 
 CreateHookClass(void, Voxel_LoadWorld)
 {
-	if (g_pVoxelAdapter)
+	// get current voxelworld ptr
+	DWORD dwVoxelWorldPtr = FindPattern(VOXELWORLD_PTR_SIG_CSNZ, VOXELWORLD_PTR_MASK_CSNZ, g_dwEngineBase, g_dwEngineBase + g_dwEngineSize, 2);
+	if (!dwVoxelWorldPtr)
+	{
+		return g_pfnVoxel_LoadWorld(ptr);
+	}
+	g_pVoxelWorld = **((CVoxelWorld***)(dwVoxelWorldPtr));
+
+	if (g_pVoxelWorld && g_pVoxelAdapter)
 	{
 		LPCWCH* lpWideCharStr = (LPCWCH*)malloc(MAX_PATH);
 
