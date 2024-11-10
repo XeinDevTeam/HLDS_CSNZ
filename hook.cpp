@@ -110,17 +110,13 @@ void CSO_Bot_Add()
 	}
 	g_pBotManager = **((CCSBotManager***)(dwBotManagerPtr));
 
-	int arg1 = 0, arg2 = 0;
+	int side = 0;
 	int argc = g_pEngine->Cmd_Argc();
 	if (argc > 0)
 	{
-		arg1 = atoi(g_pEngine->Cmd_Argv(1));
-		if (argc >= 2)
-		{
-			arg2 = atoi(g_pEngine->Cmd_Argv(2));
-		}
+		side = atoi(g_pEngine->Cmd_Argv(1));
 	}
-	g_pBotManager->Bot_Add(arg1);
+	g_pBotManager->Bot_Add(side);
 }
 
 CreateHookClass(const char*, GetSSLProtocolName)
@@ -184,6 +180,7 @@ CreateHookClass(void, Voxel_LoadWorld)
 	DWORD dwVoxelWorldPtr = FindPattern(VOXELWORLD_PTR_SIG_CSNZ, VOXELWORLD_PTR_MASK_CSNZ, g_dwEngineBase, g_dwEngineBase + g_dwEngineSize, 2);
 	if (!dwVoxelWorldPtr)
 	{
+		g_pEngine->Con_Printf("Voxel_LoadWorld: dwVoxelWorldPtr == NULL\n");
 		return g_pfnVoxel_LoadWorld(ptr);
 	}
 	g_pVoxelWorld = **((CVoxelWorld***)(dwVoxelWorldPtr));
@@ -304,6 +301,18 @@ void Init(HMODULE hModule)
 		strncpy(g_pVxlPath, vxlPath, sizeof(g_pVxlPath));
 }
 
+DWORD WINAPI HookThread(LPVOID lpThreadParameter)
+{
+	while (!g_dwMpBase) // wait for mp.dll module
+	{
+		g_dwMpBase = (DWORD)GetModuleHandle("mp.dll");
+		Sleep(500);
+	}
+	g_dwMpSize = GetModuleSize(GetModuleHandle("mp.dll"));
+
+	return TRUE;
+}
+
 void Hook(HMODULE hModule)
 {
 	Init(hModule);
@@ -390,6 +399,9 @@ void Hook(HMODULE hModule)
 		DWORD dwVoxelAdapterAddr = find + 1;
 		g_pVoxelAdapter = (tCVoxelAdapter)(dwVoxelAdapterAddr + 4 + *(DWORD*)dwVoxelAdapterAddr);
 	}
+
+	// create thread to wait for mp.dll
+	CreateThread(NULL, 0, HookThread, NULL, 0, 0);
 }
 
 void Unhook()
