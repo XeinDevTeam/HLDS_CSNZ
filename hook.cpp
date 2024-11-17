@@ -8,7 +8,6 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-HMODULE g_hEngineModule;
 DWORD g_dwEngineBase;
 DWORD g_dwEngineSize;
 
@@ -33,8 +32,8 @@ DWORD g_dwMpSize;
 #define GETSSLPROTOCOLNAME_SIG_CSNZ "\xE8\x00\x00\x00\x00\xB9\x00\x00\x00\x00\x8A\x10"
 #define GETSSLPROTOCOLNAME_MASK_CSNZ "x????x????xx"
 
-#define SOCKETCONSTRUCTOR_SIG_CSNZ "\xE8\x00\x00\x00\x00\xEB\x00\x33\xC0\xC7\x45\x00\x00\x00\x00\x00\x68"
-#define SOCKETCONSTRUCTOR_MASK_CSNZ "x????x?xxxx?????x"
+#define SOCKETCONSTRUCTOR_SIG_CSNZ "\xE8\x00\x00\x00\x00\xEB\x00\x33\xC0\x53\xFF\xB5"
+#define SOCKETCONSTRUCTOR_MASK_CSNZ "x????x?xxxxx"
 
 #define EVP_CIPHER_CTX_NEW_SIG_CSNZ "\xE8\x00\x00\x00\x00\x8B\xF8\x89\xBE"
 #define EVP_CIPHER_CTX_NEW_MASK_CSNZ "x????xxxx"
@@ -78,7 +77,7 @@ class CVoxelWorld
 
 CVoxelWorld* g_pVoxelWorld = NULL;
 
-#pragma region Nexon NGClient/NXGSM
+#pragma region Nexon NGClient
 char NGClient_Return1()
 {
 	return 1;
@@ -290,9 +289,8 @@ CreateHookClass(void, Voxel_LoadWorld)
 
 void Init(HMODULE hModule)
 {
-	g_hEngineModule = hModule;
-	g_dwEngineBase = GetModuleBase(g_hEngineModule);
-	g_dwEngineSize = GetModuleSize(g_hEngineModule);
+	g_dwEngineBase = GetModuleBase(hModule);
+	g_dwEngineSize = GetModuleSize(hModule);
 
 	g_bUseSSL = CommandLine()->CheckParm("-usessl");
 
