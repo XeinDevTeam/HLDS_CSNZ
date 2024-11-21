@@ -1,0 +1,29 @@
+Instructions for the dedicated server:
+
+1. In ServerConfig.json, the setting "HostConnectingMethod" must be set to 1 (dedicated server only) or 2 (peer to peer or dedicated server) so that the master server may use the dedicated servers in the game rooms
+2. In ServerConfig.json, the IP of the dedicated server must be in the setting "DedicatedServerWhitelist" so that the master server may use it in the game rooms
+3. Extract CSOHLDS.exe to CSNZ\Bin folder
+4. Extract fixtrike.nar to CSNZ\Data folder
+5. Run CSOHLDS.exe. If you want to connect to another server you can use -ip -lobbyport parameters in shortcut. For example: "GamePath\CSOHLDS.exe -ip 192.168.0.2 -lobbyport 30002"
+
+Launch parameter list for the dedicated server:
+1. -ip <ip> (master server's IP. default: 127.0.0.1)
+2. -lobbyport <lobbyport> (master server's port. default: 30002)
+3. -hostip <hostip> (dedicated server's IP. if not set, the master server will get the IP)
+4. -port <port> (dedicated server's port. default: 27015)
+5. -logfile <logfile> (suffix of the .log file. default: csods)
+6. -vxlpath <path> (path to where the .vxl files will be stored when downloaded by the dedicated server. the path must not contain spaces, or else it will be cut off. default: %temp%)
+7. -pingboost <value> (sleep function. 4 - NtDelayExecution(FALSE, -1LL), 5 - this_thread::yield(). if not set, the server will be stuck on 64fps, so it's recommended to either use -pingboost 4 or 5. default: 0 - this_thread::sleep_for(1ms))
+8. -usessl (use ssl when connecting to the master server. by default, not using ssl)
+
+Command list for the dedicated server:
+1. cso_bot_add (add T bot)
+2. cso_bot_add 1 (add CT bot)
+
+For the list of files that the dedicated server requires to run, refer to "List of files required for dedicated server.txt" in the folder "Documentation"
+
+fixtrike.nar links (choose one):
+
+https://www.mediafire.com/file/fna1bvm3a1rlvnz/fixtrike.nar/file
+https://mega.nz/file/NhUTnDKB#1y1_eF3HFDDMqKFyJ-WaOWW7wZg9MW-uG8i_1ce5t5U
+https://drive.google.com/file/d/1ZYhXyZCH3tfHNXvha5MttDVyJjQiZdQa/view
