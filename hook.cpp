@@ -398,6 +398,12 @@ void Hook(HMODULE hModule)
 		g_pVoxelAdapter = (tCVoxelAdapter)(dwVoxelAdapterAddr + 4 + *(DWORD*)dwVoxelAdapterAddr);
 	}
 
+	// patch 1000 fps limit
+	find = FindPush(g_dwEngineBase, g_dwEngineBase + g_dwEngineSize, "%3i fps -- host(%3.0f) sv(%3.0f) cl(%3.0f) gfx(%3.0f) snd(%3.0f) ents(%d)\n", 2);
+	DWORD patchAddr = find - 0x424;
+	BYTE patch[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+	WriteMemory((void*)patchAddr, (BYTE*)patch, sizeof(patch));
+
 	// create thread to wait for mp.dll
 	CreateThread(NULL, 0, HookThread, NULL, 0, 0);
 }
