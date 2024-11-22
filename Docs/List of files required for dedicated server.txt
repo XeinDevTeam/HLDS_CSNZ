@@ -1,0 +1,199 @@
+To run the dedicated server:
+
+maps/zbs_goldenzombie_dedi.json
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_crazy.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_jumpbuff.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_armorup.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_heal.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_shieldbuf.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_cloacking.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_trap.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_smoke.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_voodooheal.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_shock.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_rush.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_pile.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_bat.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_stiffen.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_selfdestruct.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_penetration.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_revival.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_telleport.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_boost.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_bombcreate.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_flying.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_fireball.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_dogshoot.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_violentrush.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_webshooter.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_webbomb.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_protect.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_chargeslash.csv
+resource/zombi/zombieskillproperty_dedi/zombieskillproperty_claw.csv
+
+To start a game (Any gamemode):
+
+models/p_dediweapon.mdl
+models/player/snowman-dedi.mdl
+models/vxl_dedi/vxl_partner.mdl
+models/player/deimos_zombi_origin-dedi.mdl
+models/player/deimos_zombi_origin-dedi1.seq
+models/player/deimos_zombi_host-dedi.mdl
+models/player/deimos_zombi_host-dedi1.seq
+models/player/deimos2_zombi_origin-dedi.mdl
+models/player/deimos2_zombi_origin-dedi1.seq
+models/player/booster_zombi_host-dedi.mdl
+models/player/booster_zombi_origin-dedi.mdl
+models/player/akshazombi_host-dedi.mdl
+models/player/akshazombi_origin-dedi.mdl
+models/player/pass_zombi_host-dedi.mdl
+models/player/pass_zombi_origin-dedi.mdl
+models/player/flyingzombi_host-dedi.mdl
+models/player/flyingzombi_origin-dedi.mdl
+models/player/y23s1normal_host-dedi.mdl
+models/player/y23s1normal_host-dedi1.seq
+models/player/y23s1normal_origin-dedi.mdl
+models/player/y23s1normal_origin-dedi1.seq
+models/player/y23s3normal_host-dedi.mdl
+models/player/y23s3normal_host-dedi1.seq
+models/player/y23s3normal_origin-dedi.mdl
+models/player/y23s3normal_origin-dedi1.seq
+models/player/teleport_zombi_origin-dedi.mdl
+models/player/revival_zombi_origin-dedi.mdl
+models/player/teleport_zombi_host-dedi.mdl
+models/player/revival_zombi_host-dedi.mdl
+models/player/zombi_meatwall-dedi.mdl
+models/player/zombi_spider-dedi.mdl
+models/player/zombi_deathknight-dedi.mdl
+
+To play Rebalanced Zombie Hero, Zombie Z and Zombie Evolution:
+
+models/monster/dedi-zombiedog_trans.mdl
+models/monster/dedi-zombiedog_trans.json
+
+To play Zombie Scenario:
+
+models/monster/dedi-zbs_elite_01.mdl
+models/monster/dedi-lightzombieboss.mdl
+models/monster/dedi-lightzombieboss_bomb.mdl
+models/monster/dedi-lightzombieboss_nukebomb.mdl
+models/monster/dedi-lightzombieboss_nukebombshadow.mdl
+models/monster/dedi-bearboss.mdl
+models/monster/dedi-kraken_body.mdl
+models/monster/dedi-kraken_tentacle.mdl
+models/monster/dedi-kraken_tentacle_appear.mdl
+models/monster/dedi-gluttony.mdl
+models/monster/dedi-envy_zavist.mdl
+models/monster/dedi-envy_neid.mdl
+models/monster/dedi-rex.mdl
+models/player/parcour_zombi_origin-dedi.mdl
+models/monster/dedi-grasshopper.mdl
+models/monster/dedi-zombiejack.mdl
+models/monster/dedi-cronobotics53.mdl
+models/monster/dedi-mx2000.mdl
+models/monster/dedi-mr_x_zb.mdl
+models/monster/dedi-bootleg.mdl
+models/monster/dedi-zbs_74boss.mdl
+
+To play Zombie Darkness:
+
+models/player/z4_normal/z4_normal-dedi.mdl
+models/player/z4_hide/z4_hide-dedi.mdl
+models/player/z4_heavy/z4_heavy-dedi.mdl
+models/player/z4_light/z4_light-dedi.mdl
+models/player/z4_humpback/z4_humpback-dedi.mdl
+
+To play Zombie Giant:
+
+models/player/zg_dione/zg_dione-dedi.mdl
+models/player/zg_titan/zg_titan-dedi.mdl
+models/player/zg_goliath/zg_goliath-dedi.mdl
+models/player/zg_revenant/zg_revenant-dedi.mdl
+models/player/zg_comanche/zg_comanche-dedi.mdl
+models/player/zg_angra/zg_angra-dedi.mdl
+
+To play Zombie Hide and Seek:
+
+models/player/speed_zombi_fun-dedi.mdl
+
+To play All Star:
+
+resource/allstar/allstar_skill-dedi.csv
+resource/allstar/allstar_status-dedi.csv
+
+To play Zombie Evolution:
+
+resource/zombi5/humanabilitydata_dedi.csv
+resource/zombi5/humanabilityprobdata_dedi.csv
+resource/zombi5/specialzombieprob_dedi.csv
+resource/zombi5/virusfactorreq_dedi.csv
+resource/zombi5/zombivirusbonus_dedi.csv
+
+To play Zombie Hero Last Stand Mode:
+
+resource/modeeevent/laststand_dedi.csv
+
+To play Zombie Classic Random Rules:
+
+resource/modeevent/randomrule_classic_dedi.csv
+
+To play Zombie Hero Random Rules:
+
+resource/modeevent/randomrule_dedi.csv
+
+To play Zombie Hero Protection Mode:
+
+resource/modeevent/protectionsupplyweapon_dedi.csv
+
+To play Zombie Scenario Random Transformation Mode:
+
+resource/modeevent/zstransform_skill-dedi.csv
+resource/modeevent/zstransform_status-dedi.csv
+
+To play Zombie Scenario Ability Mode:
+
+resource/modeevent/zsrogueliteability_dedi.csv
+
+To play Studio Mode:
+
+models/vxl_dedi/vxl_door.mdl
+models/vxl_dedi/vxl_onoff.mdl
+models/vxl_dedi/vxl_piston.mdl
+models/vxl_dedi/sand_a_target02.mdl
+models/vxl_dedi/sand_a_target01.mdl
+models/vxl_dedi/vxl_transit.mdl
+models/vxl_dedi/coin.mdl
+models/vxl_dedi/dice.mdl
+models/vxl_dedi/vxl_dedi_pendulumblade01.mdl
+models/vxl_dedi/shelter_b_claymore01.mdl
+models/vxl_dedi/shelter_b_electric_defense.mdl
+models/vxl_dedi/shelter_b_firegun01.mdl
+models/vxl_dedi/shelter_b_gasthank01.mdl
+models/vxl_dedi/shelter_b_mine01.mdl
+models/vxl_dedi/shelter_b_thron01.mdl
+models/vxl_dedi/shelter_b_turret01.mdl
+models/vxl_dedi/shelter_b_laser_tower.mdl
+models/vxl_dedi/shelter_b_turret02.mdl
+models/vxl_dedi/shelter_b_turret_bg01.mdl
+
+To play Zombie File:
+
+models/monster/dedi-zombi_1pve_man.mdl
+models/monster/dedi-zombi_1pve_man1.seq
+models/monster/dedi-zombi_1pve_police.mdl
+models/monster/dedi-zombi_1pve_police1.seq
+
+To fix player models animations:
+
+models/player/zombi_host-dedi.mdl
+models/player/zombi_host-dedi1.seq
+models/player/zombi_origin-dedi.mdl
+models/player/zombi_origin-dedi1.seq
+models/player/woman_dedi.mdl (newer replacement)
+models/player/woman_dedi6.seq (newer replacement)
+models/player/woman_dedi7.seq
+models/player/woman_dedi8.seq
+models/player/woman_dedi10.seq (newer replacement)
+models/player/woman_dedi11.seq
+models/player/woman_dedi12.seq
+models/player/woman_dedi13.seq (newer replacement)

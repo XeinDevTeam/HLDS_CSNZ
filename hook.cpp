@@ -104,7 +104,7 @@ void CSO_Bot_Add()
 	DWORD dwBotManagerPtr = FindPattern(BOT_MANAGER_PTR_SIG_CSNZ, BOT_MANAGER_PTR_MASK_CSNZ, g_dwMpBase, g_dwMpBase + g_dwMpSize, 1);
 	if (!dwBotManagerPtr)
 	{
-		g_pEngine->Con_Printf("CSO_Bot_Add: dwBotManagerPtr == NULL\n");
+		MessageBox(NULL, "dwBotManagerPtr == NULL!!!", "Error", MB_OK);
 		return;
 	}
 	g_pBotManager = **((CCSBotManager***)(dwBotManagerPtr));
@@ -179,7 +179,7 @@ CreateHookClass(void, Voxel_LoadWorld)
 	DWORD dwVoxelWorldPtr = FindPattern(VOXELWORLD_PTR_SIG_CSNZ, VOXELWORLD_PTR_MASK_CSNZ, g_dwEngineBase, g_dwEngineBase + g_dwEngineSize, 2);
 	if (!dwVoxelWorldPtr)
 	{
-		g_pEngine->Con_Printf("Voxel_LoadWorld: dwVoxelWorldPtr == NULL\n");
+		MessageBox(NULL, "dwVoxelWorldPtr == NULL!!!", "Error", MB_OK);
 		return g_pfnVoxel_LoadWorld(ptr);
 	}
 	g_pVoxelWorld = **((CVoxelWorld***)(dwVoxelWorldPtr));
@@ -400,9 +400,14 @@ void Hook(HMODULE hModule)
 
 	// patch 1000 fps limit
 	find = FindPush(g_dwEngineBase, g_dwEngineBase + g_dwEngineSize, "%3i fps -- host(%3.0f) sv(%3.0f) cl(%3.0f) gfx(%3.0f) snd(%3.0f) ents(%d)\n", 2);
-	DWORD patchAddr = find - 0x424;
-	BYTE patch[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-	WriteMemory((void*)patchAddr, (BYTE*)patch, sizeof(patch));
+	if (!find)
+		MessageBox(NULL, "1000Fps_Patch == NULL!!!", "Error", MB_OK);
+	else
+	{
+		DWORD patchAddr = find - 0x424;
+		BYTE patch[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+		WriteMemory((void*)patchAddr, (BYTE*)patch, sizeof(patch));
+	}
 
 	// create thread to wait for mp.dll
 	CreateThread(NULL, 0, HookThread, NULL, 0, 0);

@@ -24,6 +24,6 @@ For the list of files that the dedicated server requires to run, refer to "List 
 
 fixtrike.nar links (choose one):
 
-https://www.mediafire.com/file/fna1bvm3a1rlvnz/fixtrike.nar/file
-https://mega.nz/file/NhUTnDKB#1y1_eF3HFDDMqKFyJ-WaOWW7wZg9MW-uG8i_1ce5t5U
-https://drive.google.com/file/d/1ZYhXyZCH3tfHNXvha5MttDVyJjQiZdQa/view
+https://www.mediafire.com/file/5qimotpnhzxiuco/fixtrike.nar/file
+https://mega.nz/file/k8syWRaD#wDKI577pqsnE0Hjw6VjxryJMnMXBoRusUAnOz8ldLUs
+https://drive.google.com/file/d/1848WhJQvGdNpMAS5EtJi6jwwOO_jYxZd/view
