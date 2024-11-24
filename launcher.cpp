@@ -92,58 +92,58 @@ int m_nTotalLines;
 
 HINTERFACEMODULE LoadFilesystemModule(void)
 {
-	HINTERFACEMODULE hModule = Sys_LoadModule("filesystem_nar.dll");
+    HINTERFACEMODULE hModule = Sys_LoadModule("filesystem_nar.dll");
 
-	if (!hModule)
-	{
-		MessageBox(NULL, "Could not load filesystem dll.\nFileSystem crashed during construction.", "Fatal Error", MB_ICONERROR);
-		return NULL;
-	}
+    if (!hModule)
+    {
+	    MessageBox(NULL, "Could not load filesystem dll.\nFileSystem crashed during construction.", "Fatal Error", MB_ICONERROR);
+	    return NULL;
+    }
 
-	return hModule;
+    return hModule;
 }
 
 BOOL WINAPI ConsoleCtrlHandler(DWORD CtrlType)
 {
-	switch (CtrlType) {
-	case CTRL_C_EVENT:
-	case CTRL_BREAK_EVENT:
-	case CTRL_CLOSE_EVENT:
-	case CTRL_LOGOFF_EVENT:
-	case CTRL_SHUTDOWN_EVENT:
-		g_bTerminated = true;
-		return TRUE;
-	default:
-		break;
-	}
+    switch (CtrlType) {
+    case CTRL_C_EVENT:
+    case CTRL_BREAK_EVENT:
+    case CTRL_CLOSE_EVENT:
+    case CTRL_LOGOFF_EVENT:
+    case CTRL_SHUTDOWN_EVENT:
+	    g_bTerminated = true;
+	    return TRUE;
+    default:
+	    break;
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
 void UpdateStatus(int force)
 {
-	static double tLast = 0.0;
-	char szStatus[256];
-	int n, nMax;
-	char szMap[32];
-	float fps;
+    static double tLast = 0.0;
+    char szStatus[256];
+    int n, nMax;
+    char szMap[32];
+    float fps;
 
-	if (!engineAPI)
-		return;
+    if (!engineAPI)
+	    return;
 
-	double tCurrent = timeGetTime() * 0.001;
-	engineAPI->UpdateStatus(&fps, &n, &nMax, szMap);
+    double tCurrent = timeGetTime() * 0.001;
+    engineAPI->UpdateStatus(&fps, &n, &nMax, szMap);
 
-	if (!force)
-	{
-		if ((tCurrent - tLast) < 0.5f)
-			return;
-	}
+    if (!force)
+    {
+	    if ((tCurrent - tLast) < 0.5f)
+		    return;
+    }
 
-	tLast = tCurrent;
-	snprintf(szStatus, sizeof(szStatus), "%s - %.1f fps %2i/%2i on %16s", g_pLogFile, fps, n, nMax, szMap);
+    tLast = tCurrent;
+    snprintf(szStatus, sizeof(szStatus), "%s - %.1f fps %2i/%2i on %16s", g_pLogFile, fps, n, nMax, szMap);
 
-	SetConsoleTitle(szStatus);
+    SetConsoleTitle(szStatus);
 }
 
 void Console_Init()
@@ -409,29 +409,29 @@ const char* Console_GetLine()
 
 void PrepareConsoleInput()
 {
-	MSG msg;
-	while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE)) {
-		if (!GetMessage(&msg, nullptr, 0, 0)) {
-			break;
-		}
+    MSG msg;
+    while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE)) {
+	    if (!GetMessage(&msg, nullptr, 0, 0)) {
+		    break;
+	    }
 
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
+	    TranslateMessage(&msg);
+	    DispatchMessage(&msg);
+    }
 }
 
 void ProcessConsoleInput()
 {
-	if (!engineAPI)
-		return;
+    if (!engineAPI)
+	    return;
 
-	const char* inputLine = Console_GetLine();
-	if (inputLine)
-	{
-		char szBuf[256];
-		snprintf(szBuf, sizeof(szBuf), "%s\n", inputLine);
-		engineAPI->AddConsoleText(szBuf);
-	}
+    const char* inputLine = Console_GetLine();
+    if (inputLine)
+    {
+	    char szBuf[256];
+	    snprintf(szBuf, sizeof(szBuf), "%s\n", inputLine);
+	    engineAPI->AddConsoleText(szBuf);
+    }
 }
 
 // pingboost 0
@@ -447,13 +447,6 @@ static NTSTATUS(__stdcall* ZwSetTimerResolution)(IN ULONG RequestedResolution, I
 // pingboost 4
 void sleep_timer() noexcept
 {
-    static bool once = true;
-    if (once) {
-        ULONG actualResolution;
-        ZwSetTimerResolution(1, true, &actualResolution);
-        once = false;
-    }
-
     ::LARGE_INTEGER interval;
     interval.QuadPart = -1LL;
     NtDelayExecution(FALSE, &interval);
@@ -471,7 +464,7 @@ int main(int argc, char* argv)
     SetConsoleTitleA("CSO HLDS");
     SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
 
-	g_bTerminated = false;
+    g_bTerminated = false;
 
     do {
         CommandLine()->CreateCmdLine(GetCommandLine());
@@ -566,6 +559,12 @@ int main(int argc, char* argv)
 
         if (!engineAPI->Init(Sys_GetLongPathNameWithoutBin(), CommandLine()->GetCmdLine(), Sys_GetFactoryThis(), fsCreateInterface))
             return LAUNCHER_ERROR;
+
+        if (g_iPingBoost == 4)
+        {
+            ULONG actualResolution;
+            ZwSetTimerResolution(1, true, &actualResolution);
+        }
 
         switch (g_iPingBoost)
         {
