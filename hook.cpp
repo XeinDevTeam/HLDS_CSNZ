@@ -14,8 +14,8 @@ DWORD g_dwEngineSize;
 DWORD g_dwMpBase;
 DWORD g_dwMpSize;
 
-#define SOCKETMANAGER_SIG_CSNZ23 "\xE8\x00\x00\x00\x00\xEB\x00\x33\xC0\xA3\x00\x00\x00\x00\xB9"
-#define SOCKETMANAGER_MASK_CSNZ23 "x????x?xxx????x"
+#define SOCKETMANAGER_SIG_CSNZ23 "\xE8\x00\x00\x00\x00\xEB\x00\x33\xC0\xFF\x75\x00\x83\x7D"
+#define SOCKETMANAGER_MASK_CSNZ23 "x????x?xxxx?xx"
 
 #define PACKET_HACK_PARSE_SIG_CSNZ "\x55\x8B\xEC\x6A\x00\x68\x00\x00\x00\x00\x64\xA1\x00\x00\x00\x00\x50\x83\xEC\x00\x53\x56\x57\xA1\x00\x00\x00\x00\x33\xC5\x50\x8D\x45\x00\x64\xA3\x00\x00\x00\x00\x8B\xD9\x89\x5D\x00\x8B\x45\x00\x89\x45\x00\x8B\x45\x00\xC7\x45\x00\x00\x00\x00\x00\xC7\x45\x00\x00\x00\x00\x00\x89\x45\x00\x6A\x00\x8D\x45\x00\xC7\x45\x00\x00\x00\x00\x00\x50\x8D\x4D\x00\xE8\x00\x00\x00\x00\x0F\xB6\x45\x00\x89\x43\x00\x83\xE8"
 #define PACKET_HACK_PARSE_MASK_CSNZ "xxxx?x????xx????xxx?xxxx????xxxxx?xx????xxxx?xx?xx?xx?xx?????xx?????xx?x?xx?xx?????xxx?x????xxx?xx?xx"
@@ -26,8 +26,8 @@ DWORD g_dwMpSize;
 #define BOT_MANAGER_PTR_SIG_CSNZ "\xA3\x00\x00\x00\x00\xC7\x45\x00\x00\x00\x00\x00\xFF\x15\x00\x00\x00\x00\x83\xC4"
 #define BOT_MANAGER_PTR_MASK_CSNZ "x????xx?????xx????xx"
 
-#define LOGTOERRORLOG_SIG_CSNZ "\x55\x8B\xEC\x81\xEC\x00\x00\x00\x00\xA1\x00\x00\x00\x00\x33\xC5\x89\x45\x00\x56\x8B\x75\x00\x8D\x45\x00\x50\x6A\x00\xFF\x75\x00\x8D\x85\x00\x00\x00\x00\x68\x00\x00\x00\x00\x50\xE8\x00\x00\x00\x00\x8B\x10\xFF\x70\x00\x83\xCA\x00\x52\xFF\x15\x00\x00\x00\x00\x83\xC4"
-#define LOGTOERRORLOG_MASK_CSNZ "xxxxx????x????xxxx?xxx?xx?xx?xx?xx????x????xx????xxxx?xx?xxx????xx"
+#define LOGTOERRORLOG_SIG_CSNZ "\x53\x8B\xDC\x83\xEC\x00\x83\xE4\x00\x83\xC4\x00\x55\x8B\x6B\x00\x89\x6C\x24\x00\x8B\xEC\x81\xEC\x00\x00\x00\x00\xA1\x00\x00\x00\x00\x33\xC5\x89\x45\x00\x56\x8B\x73\x00\x8D\x43"
+#define LOGTOERRORLOG_MASK_CSNZ "xxxxx?xx?xx?xxx?xxx?xxxx????x????xxxx?xxx?xx"
 
 #define GETSSLPROTOCOLNAME_SIG_CSNZ "\xE8\x00\x00\x00\x00\xB9\x00\x00\x00\x00\x8A\x10"
 #define GETSSLPROTOCOLNAME_MASK_CSNZ "x????x????xx"
@@ -133,19 +133,19 @@ CreateHookClassType(void*, SocketConstructor, int, int a2, int a3, char a4)
 	return g_pfnSocketConstructor(ptr, a2, a3, a4);
 }
 
-CreateHook(__cdecl, void, LogToErrorLog, void* pLogFile, char* fmt, ...)
+CreateHook(__cdecl, void, LogToErrorLog, char* pLogFile, int logFileId, char* fmt, int fmtLen, ...)
 {
-	char outputString[4096];
+	char outputString[1024];
 
 	va_list va;
-	va_start(va, fmt);
+	va_start(va, fmtLen);
 	_vsnprintf_s(outputString, sizeof(outputString), fmt, va);
-	outputString[4095] = 0;
+	outputString[1023] = 0;
 	va_end(va);
 
-	printf("[LogToErrorLog] %s", outputString);
+	printf("[LogToErrorLog][%s.log] %s\n", logFileId == 3 ? "Error" : "nxa", outputString);
 
-	g_pfnLogToErrorLog(pLogFile, outputString);
+	g_pfnLogToErrorLog(pLogFile, logFileId, outputString, fmtLen);
 }
 
 std::string readStr(char* buffer, int offset)
