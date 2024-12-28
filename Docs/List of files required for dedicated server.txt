@@ -58,6 +58,10 @@ models/player/y23s3normal_host-dedi.mdl
 models/player/y23s3normal_host-dedi1.seq
 models/player/y23s3normal_origin-dedi.mdl
 models/player/y23s3normal_origin-dedi1.seq
+models/player/y25s1normal_host-dedi.mdl
+models/player/y25s1normal_host-dedi1.seq
+models/player/y25s1normal_origin-dedi.mdl
+models/player/y25s1normal_origin-dedi1.seq
 models/player/teleport_zombi_origin-dedi.mdl
 models/player/revival_zombi_origin-dedi.mdl
 models/player/teleport_zombi_host-dedi.mdl
