@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <thread>
 
+#include "IDedicatedServerAPI.h"
+
 //DLL State Flags
 
 #define DLL_INACTIVE 0		// no dll
@@ -27,48 +29,10 @@
 #define LAUNCHER_ERROR	-1
 #define LAUNCHER_OK		0
 
-class IDedicatedServerAPI : public IBaseInterface
-{
-public:
-    virtual bool Init(const char* basedir, const char* cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory) = 0;
-    virtual int Shutdown() = 0;
-    virtual bool RunFrame() = 0;
-    virtual void AddConsoleText(char* text) = 0;
-    virtual void UpdateStatus(float* fps, int* nActive, int* nMaxPlayers, char* pszMap) = 0;
-};
-
-#define VENGINE_HLDS_API_VERSION "VENGINE_HLDS_API_VERSION002"
-
-class IDedicatedExports : public IBaseInterface
-{
-public:
-    virtual ~IDedicatedExports() {};
-    virtual void Sys_Printf(const char* text) = 0;
-};
-
-#define VENGINE_DEDICATEDEXPORTS_API_VERSION "VENGINE_DEDICATEDEXPORTS_API_VERSION001"
-
-class CDedicatedExports : public IDedicatedExports {
-public:
-    void Sys_Printf(const char* text);
-};
-
-EXPOSE_SINGLE_INTERFACE(CDedicatedExports, IDedicatedExports, VENGINE_DEDICATEDEXPORTS_API_VERSION);
-
-void CDedicatedExports::Sys_Printf(const char* text)
-{
-    printf(text);
-}
-
-using SleepFunc = void (*)();
-SleepFunc sleep_thread = nullptr;
-
 char g_pLogFile[MAX_PATH];
 int g_iPort = 27015;
-int g_iPingBoost = 0;
 bool g_bTerminated = false;
 IFileSystem* g_pFileSystem;
-IDedicatedServerAPI* engineAPI = NULL;
 
 HANDLE hConsoleInput;
 HANDLE hConsoleOutput;
@@ -96,8 +60,8 @@ HINTERFACEMODULE LoadFilesystemModule(void)
 
     if (!hModule)
     {
-	    MessageBox(NULL, "Could not load filesystem dll.\nFileSystem crashed during construction.", "Fatal Error", MB_ICONERROR);
-	    return NULL;
+        MessageBox(NULL, "Could not load filesystem dll.\nFileSystem crashed during construction.", "Fatal Error", MB_ICONERROR);
+        return NULL;
     }
 
     return hModule;
@@ -111,10 +75,10 @@ BOOL WINAPI ConsoleCtrlHandler(DWORD CtrlType)
     case CTRL_CLOSE_EVENT:
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
-	    g_bTerminated = true;
-	    return TRUE;
+        g_bTerminated = true;
+        return TRUE;
     default:
-	    break;
+        break;
     }
 
     return FALSE;
@@ -129,19 +93,19 @@ void UpdateStatus(int force)
     float fps;
 
     if (!engineAPI)
-	    return;
+        return;
 
     double tCurrent = timeGetTime() * 0.001;
     engineAPI->UpdateStatus(&fps, &n, &nMax, szMap);
 
     if (!force)
     {
-	    if ((tCurrent - tLast) < 0.5f)
-		    return;
+        if ((tCurrent - tLast) < 0.5f)
+            return;
     }
 
     tLast = tCurrent;
-    snprintf(szStatus, sizeof(szStatus), "%s - %.1f fps %2i/%2i on %16s", g_pLogFile, fps, n, nMax, szMap);
+    snprintf(szStatus, sizeof(szStatus), "%s - %.1f fps %2i/%2i on %16s", engineAPI->szLogFormat, fps, n, nMax, szMap);
 
     SetConsoleTitle(szStatus);
 }
@@ -411,51 +375,114 @@ void PrepareConsoleInput()
 {
     MSG msg;
     while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE)) {
-	    if (!GetMessage(&msg, nullptr, 0, 0)) {
-		    break;
-	    }
+        if (!GetMessage(&msg, nullptr, 0, 0)) {
+            break;
+        }
 
-	    TranslateMessage(&msg);
-	    DispatchMessage(&msg);
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
     }
 }
 
 void ProcessConsoleInput()
 {
     if (!engineAPI)
-	    return;
+        return;
 
     const char* inputLine = Console_GetLine();
     if (inputLine)
     {
-	    char szBuf[256];
-	    snprintf(szBuf, sizeof(szBuf), "%s\n", inputLine);
-	    engineAPI->AddConsoleText(szBuf);
+        char szBuf[256];
+        snprintf(szBuf, sizeof(szBuf), "%s\n", inputLine);
+        engineAPI->AddConsoleText(szBuf);
     }
 }
 
-// pingboost 0
-void sleep_1ms() noexcept
-{
-    using namespace std::chrono_literals;
-    std::this_thread::sleep_for(1ms);
+typedef NTSTATUS(__stdcall* pfnNtDelayExecution)(BOOL Alertable, PLARGE_INTEGER DelayInterval);
+typedef NTSTATUS(__stdcall* pfnZwSetTimerResolution)(IN ULONG RequestedResolution, IN BOOLEAN Set, OUT PULONG ActualResolution);
+
+template<typename X>
+X lazyGetProcAddress(char* szFuncName) {
+    return reinterpret_cast<X>(GetProcAddress(GetModuleHandle("ntdll.dll"), szFuncName));
 }
 
-static NTSTATUS(__stdcall* NtDelayExecution)(BOOL Alertable, PLARGE_INTEGER DelayInterval) = (NTSTATUS(__stdcall*)(BOOL, PLARGE_INTEGER)) GetProcAddress(GetModuleHandle("ntdll.dll"), "NtDelayExecution");
-static NTSTATUS(__stdcall* ZwSetTimerResolution)(IN ULONG RequestedResolution, IN BOOLEAN Set, OUT PULONG ActualResolution) = (NTSTATUS(__stdcall*)(ULONG, BOOLEAN, PULONG)) GetProcAddress(GetModuleHandle("ntdll.dll"), "ZwSetTimerResolution");
+static pfnNtDelayExecution     NtDelayExecution     = lazyGetProcAddress<pfnNtDelayExecution>    ("NtDelayExecution");
+static pfnZwSetTimerResolution ZwSetTimerResolution = lazyGetProcAddress<pfnZwSetTimerResolution>("ZwSetTimerResolution");
 
-// pingboost 4
-void sleep_timer() noexcept
-{
-    ::LARGE_INTEGER interval;
-    interval.QuadPart = -1LL;
-    NtDelayExecution(FALSE, &interval);
-}
+// must after ParseCommandLine()
+class PingBoost {
+public:
+    PingBoost(){
+        int type = 0;
 
-// pingboost 5
-void yield_thread() noexcept
-{
-    std::this_thread::yield();
+        const char* pingboost;
+        if (CommandLine()->CheckParm("-pingboost", &pingboost) && pingboost)
+            type = atoi(pingboost);
+
+        if (type > 6 || type < 0)
+        {
+            MessageBox(NULL, "-pingboost <0/4/5> only", "Error", MB_OK | MB_ICONERROR);
+            exit(1);
+        }
+
+        switch (type) {
+        case 4:
+            pfnSleepFunc = []() noexcept {
+                ::LARGE_INTEGER interval;
+                interval.QuadPart = -1LL;
+                NtDelayExecution(FALSE, &interval);
+                };
+            break;
+        case 5:
+            pfnSleepFunc = []() noexcept {
+                std::this_thread::yield();
+                };
+            break;
+        default:
+            pfnSleepFunc = []() noexcept {
+                using namespace std::chrono_literals;
+                std::this_thread::sleep_for(1ms);
+                };
+            break;
+        }
+    }
+
+    void Sleep() noexcept {
+        pfnSleepFunc();
+    }
+
+private:
+    void (*pfnSleepFunc)();
+};
+
+void ParseCommandLine() {
+    CommandLine()->CreateCmdLine(GetCommandLine());
+    CommandLine()->RemoveParm("-steam");
+    CommandLine()->AppendParm("-console", nullptr);
+
+    if (CommandLine()->CheckParm("-lang") == NULL)
+        CommandLine()->AppendParm("-lang", "na_");
+
+    if (CommandLine()->CheckParm("-ip") == NULL)
+        CommandLine()->AppendParm("-ip", DEFAULT_IP);
+
+    if (CommandLine()->CheckParm("-lobbyport") == NULL)
+        CommandLine()->AppendParm("-lobbyport", DEFAULT_LOBBYPORT);
+
+    const char* port;
+    if (CommandLine()->CheckParm("-port", &port))
+    {
+        auto iPort = atoi(port);
+        if (iPort)
+            g_iPort = iPort;
+    }
+
+    if (CommandLine()->CheckParm("-vxlpath") == NULL)
+    {
+        TCHAR lpTempPathBuffer[MAX_PATH];
+        GetTempPath(MAX_PATH, lpTempPathBuffer);
+        CommandLine()->AppendParm("-vxlpath", lpTempPathBuffer);
+    }
 }
 
 int main(int argc, char* argv)
@@ -466,65 +493,12 @@ int main(int argc, char* argv)
 
     g_bTerminated = false;
 
-    do {
-        CommandLine()->CreateCmdLine(GetCommandLine());
-        CommandLine()->RemoveParm("-steam");
-        CommandLine()->AppendParm("-console", nullptr);
+    ParseCommandLine();
+    PingBoost* pingboost = new PingBoost();
 
+    do {
         WSAData WSAData;
         WSAStartup(0x202, &WSAData);
-
-        if (CommandLine()->CheckParm("-lang") == NULL)
-            CommandLine()->AppendParm("-lang", "na_"); 	// the dedicated server won't load without this line
-
-        if (CommandLine()->CheckParm("-ip") == NULL)
-            CommandLine()->AppendParm("-ip", DEFAULT_IP);
-
-        if (CommandLine()->CheckParm("-lobbyport") == NULL)
-            CommandLine()->AppendParm("-lobbyport", DEFAULT_LOBBYPORT);
-
-        const char* port;
-        if (CommandLine()->CheckParm("-port", &port) == NULL)
-        {
-            CommandLine()->AppendParm("-port", DEFAULT_PORT);
-            g_iPort = atoi(DEFAULT_PORT);
-        }
-        else if (port)
-            g_iPort = atoi(port);
-
-        const char* logfile;
-        if (CommandLine()->CheckParm("-logfile", &logfile) == NULL)
-        {
-            CommandLine()->AppendParm("-logfile", DEFAULT_LOGFILE);
-            memcpy(g_pLogFile, DEFAULT_LOGFILE, sizeof(g_pLogFile));
-        }
-        else if (logfile)
-            memcpy(g_pLogFile, logfile, sizeof(g_pLogFile));
-
-        time_t currentTime = time(NULL);
-        tm* currentLocalTime = localtime(&currentTime);
-        int currentProcessId = GetCurrentProcessId();
-        snprintf(g_pLogFile, sizeof(g_pLogFile), "%s_%04d%02d%02d_%02d%02d%02d_%u_%d",
-            g_pLogFile,
-            currentLocalTime->tm_year + 1900,
-            currentLocalTime->tm_mon + 1,
-            currentLocalTime->tm_mday,
-            currentLocalTime->tm_hour,
-            currentLocalTime->tm_min,
-            currentLocalTime->tm_sec,
-            currentProcessId,
-            g_iPort);
-
-        if (CommandLine()->CheckParm("-vxlpath") == NULL)
-        {
-            TCHAR lpTempPathBuffer[MAX_PATH];
-            GetTempPath(MAX_PATH, lpTempPathBuffer);
-            CommandLine()->AppendParm("-vxlpath", lpTempPathBuffer);
-        }
-
-        const char* pingboost;
-        if (CommandLine()->CheckParm("-pingboost", &pingboost) && pingboost)
-            g_iPingBoost = atoi(pingboost);
 
         HINTERFACEMODULE hFileSystem = LoadFilesystemModule();
 
@@ -549,34 +523,15 @@ int main(int argc, char* argv)
             return LAUNCHER_ERROR;
         }
 
-        CreateInterfaceFn engineCreateInterface = (CreateInterfaceFn)Sys_GetFactory(hEngine);
-        engineAPI = (IDedicatedServerAPI*)engineCreateInterface(VENGINE_HLDS_API_VERSION, NULL);
-
-        if (!engineCreateInterface || !engineAPI)
-            return LAUNCHER_ERROR;
-
         Hook((HMODULE)hEngine);
 
         if (!engineAPI->Init(Sys_GetLongPathNameWithoutBin(), CommandLine()->GetCmdLine(), Sys_GetFactoryThis(), fsCreateInterface))
             return LAUNCHER_ERROR;
 
-        if (g_iPingBoost == 4)
-        {
-            ULONG actualResolution;
-            ZwSetTimerResolution(1, true, &actualResolution);
-        }
-
-        switch (g_iPingBoost)
-        {
-        case 4: sleep_thread = sleep_timer; break;
-        case 5: sleep_thread = yield_thread; break;
-        default: sleep_thread = sleep_1ms;
-        }
-
         bool done = false;
         while (!done)
         {
-            sleep_thread();
+            pingboost->Sleep();
 
             PrepareConsoleInput();
 

@@ -55,6 +55,7 @@
       <StringPooling>
       </StringPooling>
       <ControlFlowGuard>false</ControlFlowGuard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -71,8 +72,7 @@
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>copy "$(TargetPath)" "D:\SteamLibrary\steamapps\common\CSNZ\Bin\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -85,6 +85,7 @@
       <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>Interface/;HLSDK/common;HLSDK/engine;HLSDK/cl_dll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -95,8 +96,7 @@
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>copy "$(TargetPath)" "D:\SteamLibrary\steamapps\common\CSNZ\Bin\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -104,6 +104,7 @@
     <ClCompile Include="Detours\detours.cpp" />
     <ClCompile Include="Detours\disasm.cpp" />
     <ClCompile Include="Detours\modules.cpp" />
+    <ClCompile Include="Engine.cpp" />
     <ClCompile Include="HLSDK\common\interface.cpp" />
     <ClCompile Include="hook.cpp" />
     <ClCompile Include="hookutils.cpp" />

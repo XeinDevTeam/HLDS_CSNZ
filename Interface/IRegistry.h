@@ -16,5 +16,20 @@ public:
 	virtual void WriteString(const char *key, const char *value) = 0;
 };
 
-extern IRegistry *registry;
+class CRegistry {
+public:
+    virtual void Init();
+    virtual void Shutdown();
+    virtual int ReadInt(const char* key, int defaultValue);
+    virtual void WriteInt(const char* key, int value);
+    virtual const char* ReadString(const char* key, const char* defaultValue);
+    virtual void WriteString(const char* key, const char* value);
+    virtual ~CRegistry();
+
+private:
+    bool bValid;
+    HKEY hKey;
+};
+
+extern CRegistry* registry;
 #endif
